@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useState } from "react";
-import AdminSideBar from "../../components/AdminSideBar";
+import AdminSideBar from "../../../components/admin/AdminSideBar";
 
 const ProductManagement = () => {
 
