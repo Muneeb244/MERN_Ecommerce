@@ -35,8 +35,10 @@ $color1: white;
 $color2: rgb(46, 46, 46);
 $color3: rgb(0, 104, 136);
 
-
 @import "./admin/mixins";
+
+@import "home";
+
 @import "./admin/dashboard";
 @import "./admin/products";
 @import "./admin/chart";
