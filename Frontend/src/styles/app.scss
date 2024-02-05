@@ -38,6 +38,8 @@ $color3: rgb(0, 104, 136);
 @import "./admin/mixins";
 
 @import "home";
+@import "cart";
+@import "shipping";
 
 @import "./admin/dashboard";
 @import "./admin/products";
