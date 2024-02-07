@@ -40,6 +40,8 @@ $color3: rgb(0, 104, 136);
 @import "home";
 @import "cart";
 @import "shipping";
+@import "login";
+@import "search";
 
 @import "./admin/dashboard";
 @import "./admin/products";
@@ -47,6 +49,12 @@ $color3: rgb(0, 104, 136);
 @import "./admin/apps";
 @import "./admin/mediaquery";
 
+
+.heading {
+  @include heading;
+  margin: 1rem 0;
+  text-align: center;
+}
 
 
 .header{
