@@ -3,8 +3,8 @@ import { FaSearch, FaShoppingBag, FaSignInAlt, FaSignOutAlt, FaUser } from "reac
 import { Link } from "react-router-dom";
 
 const user = {
-  _id: "",
-  roll: ""
+  _id: "adfa",
+  roll: "admin"
 };
 
 const Header = () => {
