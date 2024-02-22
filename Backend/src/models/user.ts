@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 import Validator from "validator";
 
 interface IUser extends Document {

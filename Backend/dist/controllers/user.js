@@ -36,7 +36,9 @@ export const getUser = asyncMiddleware(async (req, res, next) => {
     });
 });
 export const deleteUser = asyncMiddleware(async (req, res, next) => {
-    const id = req.params.id;
+    // changes this here
+    // const id = (req.params as {id:string}).id;
+    const { id } = req.params;
     const user = await User.findById(id);
     if (!user)
         return next(new ErrorHandler("Invalid Id", 400));

@@ -3,6 +3,7 @@ import morgan from 'morgan';
 
 // import routes
 import userRoute from './routes/user.js'
+import productRoute from './routes/products.js'
 
 // import middleware
 import errorHandler from './middlewares/errorHandler.js'
@@ -20,7 +21,9 @@ app.get("/",(req, res) => {
 app.use(morgan('combined'));
 app.use(express.json())
 app.use("/api/v1/user", userRoute);
-app.use(errorHandler)
+app.use("/api/v1/product", productRoute);
+app.use("/uploads", express.static("uploads"))
+// app.use(errorHandler)
 
 
 app.listen(port, () => {
