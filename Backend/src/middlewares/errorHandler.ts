@@ -3,7 +3,10 @@ import ErrorHandler from "../utils/utility-class.js";
 
 export default (err:ErrorHandler, req:Request, res:Response, next:NextFunction) => {
     const errStatus = err.statusCode || 500;
-    const errMsg = err.message || "Something went wrong";
+    let errMsg = err.message || "Something went wrong";
+
+    if(err.name === "CastError") errMsg = "Invalid Id"
+
     res.status(errStatus).json({
         success: false,
         status: errStatus,
