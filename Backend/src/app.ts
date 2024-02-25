@@ -7,6 +7,7 @@ import {config} from "dotenv";
 import userRoute from './routes/user.js'
 import productRoute from './routes/products.js'
 import orderRoute from './routes/orders.js'
+import paymentRoute from './routes/payment.js'
 
 // import middleware
 import errorHandler from './middlewares/errorHandler.js'
@@ -31,6 +32,7 @@ app.use(express.json())
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/product", productRoute);
 app.use("/api/v1/order", orderRoute);
+app.use("/api/v1/payment", paymentRoute);
 
 app.use("/uploads", express.static("uploads"))
 app.use(errorHandler)
