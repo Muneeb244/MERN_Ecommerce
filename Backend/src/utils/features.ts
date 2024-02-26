@@ -18,7 +18,7 @@ export const invalidatesCache = async ({
   admin,
   userId,
   orderId,
-  productId
+  productId,
 }: InvalidateCacheProps) => {
   if (product) {
     const productKeys: string[] = [
@@ -26,7 +26,7 @@ export const invalidatesCache = async ({
       "categories",
       "all-products",
     ];
-    
+
     if (typeof productId === "string") productKeys.push(`product-${productId}`);
 
     if (typeof productId === "object")
@@ -35,15 +35,14 @@ export const invalidatesCache = async ({
     myCache.del(productKeys);
   }
 
-
-  if(order){
+  if (order) {
     const orderKeys: string[] = [
       "all-orders",
       `my-orders-${userId}`,
       `order-${orderId}`,
     ];
 
-    myCache.del(orderKeys)
+    myCache.del(orderKeys);
   }
   // if(admin)
 };
@@ -56,4 +55,11 @@ export const reduceStock = async (orderItems: OrderItemType[]) => {
     product.stock -= order.quantity;
     await product.save();
   }
+};
+
+export const calculatePercentage = (thisMonth: number, lastMonth: number) => {
+  if (lastMonth === 0) return thisMonth * 100;
+
+  const percent = ((thisMonth - lastMonth) / lastMonth) * 100;
+  return Number(percent.toFixed(0));
 };

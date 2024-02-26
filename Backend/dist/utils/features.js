@@ -9,7 +9,7 @@ export const connectDB = (uri) => {
         .then((con) => console.log(`Connected to ${con.connection.host}`))
         .catch((err) => console.log(err));
 };
-export const invalidatesCache = async ({ product, order, admin, userId, orderId, productId }) => {
+export const invalidatesCache = async ({ product, order, admin, userId, orderId, productId, }) => {
     if (product) {
         const productKeys = [
             "latest-products",
@@ -41,4 +41,10 @@ export const reduceStock = async (orderItems) => {
         product.stock -= order.quantity;
         await product.save();
     }
+};
+export const calculatePercentage = (thisMonth, lastMonth) => {
+    if (lastMonth === 0)
+        return thisMonth * 100;
+    const percent = ((thisMonth - lastMonth) / lastMonth) * 100;
+    return Number(percent.toFixed(0));
 };
