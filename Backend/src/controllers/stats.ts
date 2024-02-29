@@ -3,13 +3,17 @@ import { asyncMiddleware } from "../middlewares/asyncMidleware.js";
 import { Order } from "../models/order.js";
 import { Product } from "../models/product.js";
 import { User } from "../models/user.js";
-import { calculatePercentage, getInventories } from "../utils/features.js";
+import {
+  calculatePercentage,
+  getChartData,
+  getInventories,
+} from "../utils/features.js";
 
 export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
   let stats = {};
+  const key = "admin-stats";
 
-  if (myCache.has("admin-stats"))
-    stats = JSON.parse(myCache.get("admin-stats") as string);
+  if (myCache.has(key)) stats = JSON.parse(myCache.get(key) as string);
   else {
     const today = new Date();
     const sixMonthsAgo = new Date();
@@ -152,7 +156,7 @@ export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
 
     lastSixMonthsOrders.forEach((order) => {
       const creationDate = order.createdAt;
-      const monthDiff = today.getMonth() - creationDate.getMonth();
+      const monthDiff = (today.getMonth() - creationDate.getMonth() + 12) % 12;
 
       if (monthDiff < 6) {
         orderMonthCounts[5 - monthDiff] += 1;
@@ -190,7 +194,7 @@ export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
       latesttransaction: modifyTransaction,
     };
 
-    myCache.set("admin-stats", JSON.stringify(stats));
+    myCache.set(key, JSON.stringify(stats));
   } // else end
 
   return res.status(200).json({
@@ -199,11 +203,13 @@ export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
   });
 });
 
+// Pie chart
 export const getPieCharts = asyncMiddleware(async (req, res, next) => {
   let charts;
+  const key = "admin-pie-charts";
 
-  if (myCache.has("admin-pie-charts")) {
-    charts = JSON.parse(myCache.get("admin-pie-charts") as string);
+  if (myCache.has(key)) {
+    charts = JSON.parse(myCache.get(key) as string);
   } else {
     const allOrderPromise = Order.find({}).select([
       "total",
@@ -253,7 +259,6 @@ export const getPieCharts = asyncMiddleware(async (req, res, next) => {
       outOfStock: productsOutOfStock,
     };
 
-
     //revenueDistribution
     const grossIncome = allOrder.reduce(
       (prev, order) => prev + (order.total || 0),
@@ -302,7 +307,7 @@ export const getPieCharts = asyncMiddleware(async (req, res, next) => {
       usersAgeGroup,
     };
 
-    myCache.set("admin-pie-charts", JSON.stringify(charts) as string);
+    myCache.set(key, JSON.stringify(charts) as string);
   } //end else
   return res.status(200).json({
     success: true,
@@ -310,6 +315,68 @@ export const getPieCharts = asyncMiddleware(async (req, res, next) => {
   });
 });
 
-export const getBarCharts = asyncMiddleware(async (req, res, next) => {});
+export const getBarCharts = asyncMiddleware(async (req, res, next) => {
+  let charts;
+  const key = "admin-bar-charts";
+
+  if (myCache.has(key)) {
+    charts = JSON.parse(myCache.get(key) as string);
+  } else {
+    const today = new Date();
+
+    // Six month ago products and users
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const sixMonthProductsPromise = Product.find({
+      createdAt: {
+        $gte: sixMonthsAgo,
+        $lte: today,
+      },
+    }).select("createdAt");
+
+    const sixMonthUsersPromise = User.find({
+      createdAt: {
+        $gte: sixMonthsAgo,
+        $lte: today,
+      },
+    }).select("createdAt");
+
+    //twelve months ago products
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+    const twelveMonthOrdersPromise = Order.find({
+      createdAt: {
+        $gte: twelveMonthsAgo,
+        $lte: today,
+      },
+    }).select("createdAt");
+
+    const [products, users, orders] = await Promise.all([
+      sixMonthProductsPromise,
+      sixMonthUsersPromise,
+      twelveMonthOrdersPromise,
+    ]);
+
+    console.log(users)
+
+    const productCounts = getChartData({ length: 6, today, docArr: products });
+    const userCounts = getChartData({ length: 6, today, docArr: users });
+    const orderCounts = getChartData({ length: 12, today, docArr: orders });
+
+    charts = {
+      users: userCounts,
+      product: productCounts,
+      orders: orderCounts,
+    };
+
+    myCache.set(key, JSON.stringify(charts));
+  } // end else
+  return res.status(200).json({
+    success: true,
+    charts,
+  });
+});
 
 export const getLineCharts = asyncMiddleware(async (req, res, next) => {});
