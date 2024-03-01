@@ -5,7 +5,6 @@ import ErrorHandler from "../utils/utility-class.js";
 import { Order } from "../models/order.js";
 import { invalidatesCache, reduceStock } from "../utils/features.js";
 import { myCache } from "../app.js";
-import errorHandler from "../middlewares/errorHandler.js";
 
 export const myOrders = asyncMiddleware(async (req, res, next) => {
   const { id: user } = req.query;
@@ -91,7 +90,7 @@ export const newOrder = asyncMiddleware(
 
     await reduceStock(orderItems);
 
-    await invalidatesCache({
+    invalidatesCache({
       product: true,
       order: true,
       admin: true,

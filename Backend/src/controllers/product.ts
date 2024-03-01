@@ -11,8 +11,6 @@ import { rm } from "fs";
 import { myCache } from "../app.js";
 import { invalidatesCache } from "../utils/features.js";
 
-
-
 //Revalidate on New,Update,Delete product, New Order
 export const getLatestProducts = asyncMiddleware(async (req, res, next) => {
   let products = [];
@@ -28,7 +26,6 @@ export const getLatestProducts = asyncMiddleware(async (req, res, next) => {
     products,
   });
 });
-
 
 //Revalidate on New,Update,Delete product, New Order
 export const getAllCategories = asyncMiddleware(async (req, res, next) => {
@@ -47,7 +44,6 @@ export const getAllCategories = asyncMiddleware(async (req, res, next) => {
   });
 });
 
-
 //Revalidate on New,Update,Delete product, New Order
 export const getAdminProducts = asyncMiddleware(async (req, res, next) => {
   let products = [];
@@ -65,18 +61,17 @@ export const getAdminProducts = asyncMiddleware(async (req, res, next) => {
   });
 });
 
-
 //Revalidate on New,Update,Delete product, New Order
 export const getSingleProduct = asyncMiddleware(async (req, res, next) => {
-  
   const id = req.params.id;
 
   let product;
-  if(myCache.has(`product-${id}`)) product = JSON.parse(myCache.get(`product-${id}`)!)
+  if (myCache.has(`product-${id}`))
+    product = JSON.parse(myCache.get(`product-${id}`)!);
   else {
     product = await Product.findById(id);
     if (!product) return next(new ErrorHandler("product not found", 404));
-    myCache.set(`product-${id}`, JSON.stringify(product))
+    myCache.set(`product-${id}`, JSON.stringify(product));
   }
 
   return res.status(200).json({
@@ -84,7 +79,6 @@ export const getSingleProduct = asyncMiddleware(async (req, res, next) => {
     product,
   });
 });
-
 
 export const newProduct = asyncMiddleware(
   async (
@@ -114,7 +108,7 @@ export const newProduct = asyncMiddleware(
       photo: photo.path,
     });
 
-    await invalidatesCache({product:true});
+    invalidatesCache({ product: true, admin: true });
 
     return res.status(201).json({
       success: true,
@@ -122,8 +116,6 @@ export const newProduct = asyncMiddleware(
     });
   }
 );
-
-
 
 export const updateProduct = asyncMiddleware(
   async (
@@ -152,7 +144,11 @@ export const updateProduct = asyncMiddleware(
 
     await product.save();
 
-    await invalidatesCache({product:true, productId: String(product._id)});
+    invalidatesCache({
+      product: true,
+      admin: true,
+      productId: String(product._id),
+    });
 
     return res.status(200).json({
       success: true,
@@ -160,8 +156,6 @@ export const updateProduct = asyncMiddleware(
     });
   }
 );
-
-
 
 export const deleteProduct = asyncMiddleware(async (req, res, next) => {
   const { id } = req.params;
@@ -175,15 +169,17 @@ export const deleteProduct = asyncMiddleware(async (req, res, next) => {
 
   await product.deleteOne();
 
-  await invalidatesCache({product:true, productId: String(product._id)});
+  invalidatesCache({
+    product: true,
+    admin: true,
+    productId: String(product._id),
+  });
 
   return res.status(200).json({
     success: true,
     message: "product deleted successfully",
   });
 });
-
-
 
 export const getAllProducts = asyncMiddleware(
   async (req: Request<{}, {}, {}, SearchRequestQuery>, res: Response) => {

@@ -81,7 +81,7 @@ export const newProduct = asyncMiddleware(async (req, res, next) => {
         category: category.toLowerCase(),
         photo: photo.path,
     });
-    await invalidatesCache({ product: true });
+    invalidatesCache({ product: true, admin: true });
     return res.status(201).json({
         success: true,
         message: "Product created successfully",
@@ -109,7 +109,11 @@ export const updateProduct = asyncMiddleware(async (req, res, next) => {
     if (category)
         product.category = category;
     await product.save();
-    await invalidatesCache({ product: true, productId: String(product._id) });
+    invalidatesCache({
+        product: true,
+        admin: true,
+        productId: String(product._id),
+    });
     return res.status(200).json({
         success: true,
         message: "Product Updated Successfully",
@@ -124,7 +128,11 @@ export const deleteProduct = asyncMiddleware(async (req, res, next) => {
         console.log("Photo deleted");
     });
     await product.deleteOne();
-    await invalidatesCache({ product: true, productId: String(product._id) });
+    invalidatesCache({
+        product: true,
+        admin: true,
+        productId: String(product._id),
+    });
     return res.status(200).json({
         success: true,
         message: "product deleted successfully",

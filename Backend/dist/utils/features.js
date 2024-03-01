@@ -30,7 +30,14 @@ export const invalidatesCache = async ({ product, order, admin, userId, orderId,
         ];
         myCache.del(orderKeys);
     }
-    // if(admin)
+    if (admin) {
+        myCache.del([
+            "admin-stats",
+            "admin-pie-charts",
+            "admin-bar-charts",
+            "admin-line-charts",
+        ]);
+    }
 };
 export const reduceStock = async (orderItems) => {
     for (let i = 0; i < orderItems.length; i++) {
@@ -58,13 +65,18 @@ export const getInventories = async ({ categories, productsCount, }) => {
     });
     return categoryCount;
 };
-export const getChartData = ({ length, docArr, today }) => {
+export const getChartData = ({ length, docArr, today, property, }) => {
     const data = new Array(length).fill(0);
     docArr.forEach((i) => {
         const creationDate = i.createdAt;
         const monthDiff = (today.getMonth() - creationDate.getMonth() + 12) % 12;
         if (monthDiff < length) {
-            data[length - monthDiff - 1] += 1;
+            if (property) {
+                data[length - monthDiff - 1] += i[property];
+            }
+            else {
+                data[length - monthDiff - 1] += 1;
+            }
         }
     });
     return data;

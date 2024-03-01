@@ -1,8 +1,11 @@
 import express from 'express'
-import { discount, newCoupon, allCoupons,deleteCoupon } from '../controllers/coupon.js';
+import { discount, newCoupon, allCoupons,deleteCoupon, createPaymentIntent } from '../controllers/coupon.js';
 import { adminOnly } from '../middlewares/auth.js';
 
 const app = express.Router();
+
+// route - /api/v1/payment/coupon/create
+app.get("/create", createPaymentIntent);
 
 // route - /api/v1/payment/coupon/new
 app.get("/discount", discount);

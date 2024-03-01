@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import NodeCache from 'node-cache';
 import { config } from "dotenv";
+import Stripe from 'stripe';
 // import routes
 import userRoute from './routes/user.js';
 import productRoute from './routes/products.js';
@@ -14,8 +15,10 @@ import { connectDB } from './utils/features.js';
 config({ path: "./.env" });
 const port = process.env.PORT || 4000;
 const mongo_URI = process.env.MONGO_URI || "";
+const stripeKey = process.env.STRIPEKEY || "";
 connectDB(mongo_URI);
 const app = express();
+export const stripe = new Stripe(stripeKey);
 export const myCache = new NodeCache();
 app.get("/", (req, res) => {
     res.send("API working");

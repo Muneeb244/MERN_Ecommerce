@@ -151,17 +151,16 @@ export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
       order: allOrders.length,
     };
 
-    const orderMonthCounts = new Array(6).fill(0);
-    const orderMonthlyRevenue = new Array(6).fill(0);
-
-    lastSixMonthsOrders.forEach((order) => {
-      const creationDate = order.createdAt;
-      const monthDiff = (today.getMonth() - creationDate.getMonth() + 12) % 12;
-
-      if (monthDiff < 6) {
-        orderMonthCounts[5 - monthDiff] += 1;
-        orderMonthlyRevenue[5 - monthDiff] += order.total;
-      }
+    const orderMonthCounts = getChartData({
+      length: 6,
+      today,
+      docArr: lastSixMonthsOrders,
+    });
+    const orderMonthlyRevenue = getChartData({
+      length: 6,
+      today,
+      docArr: lastSixMonthsOrders,
+      property: "total",
     });
 
     const categoryCount: Record<string, number>[] = await getInventories({
@@ -359,8 +358,6 @@ export const getBarCharts = asyncMiddleware(async (req, res, next) => {
       twelveMonthOrdersPromise,
     ]);
 
-    console.log(users)
-
     const productCounts = getChartData({ length: 6, today, docArr: products });
     const userCounts = getChartData({ length: 6, today, docArr: users });
     const orderCounts = getChartData({ length: 12, today, docArr: orders });
@@ -379,4 +376,69 @@ export const getBarCharts = asyncMiddleware(async (req, res, next) => {
   });
 });
 
-export const getLineCharts = asyncMiddleware(async (req, res, next) => {});
+export const getLineCharts = asyncMiddleware(async (req, res, next) => {
+  let charts;
+  const key = "admin-line-charts";
+
+  if (myCache.has(key)) {
+    charts = JSON.parse(myCache.get(key) as string);
+  } else {
+    const today = new Date();
+
+    //twelve months ago products
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+    const baseQuery = {
+      createdAt: {
+        $gte: twelveMonthsAgo,
+        $lte: today,
+      },
+    };
+
+    const twelveMonthProductsPromise =
+      Product.find(baseQuery).select("createdAt");
+
+    const twelveMonthUsersPromise = User.find(baseQuery).select("createdAt");
+
+    const twelveMonthOrdersPromise = Order.find(baseQuery).select([
+      "createdAt",
+      "discount",
+      "total",
+    ]);
+
+    const [products, users, orders] = await Promise.all([
+      twelveMonthProductsPromise,
+      twelveMonthUsersPromise,
+      twelveMonthOrdersPromise,
+    ]);
+
+    const productCounts = getChartData({ length: 12, today, docArr: products });
+    const userCounts = getChartData({ length: 12, today, docArr: users });
+    const discount = getChartData({
+      length: 12,
+      today,
+      docArr: orders,
+      property: "discount",
+    });
+    const revenue = getChartData({
+      length: 12,
+      today,
+      docArr: orders,
+      property: "total",
+    });
+
+    charts = {
+      users: userCounts,
+      product: productCounts,
+      discount,
+      revenue,
+    };
+
+    myCache.set(key, JSON.stringify(charts));
+  } // end else
+  return res.status(200).json({
+    success: true,
+    charts,
+  });
+});

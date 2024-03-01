@@ -64,7 +64,7 @@ export const newOrder = asyncMiddleware(async (req, res, next) => {
         total,
     });
     await reduceStock(orderItems);
-    await invalidatesCache({
+    invalidatesCache({
         product: true,
         order: true,
         admin: true,
