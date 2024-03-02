@@ -13,6 +13,7 @@ export const newUser = asyncMiddleware(async (req, res, next) => {
     if (!_id || !name || !email || !photo || !gender || !dob)
         return next(new ErrorHandler("Please add all fields", 400));
     user = await User.create({ name, email, photo, gender, _id, dob });
+    console.log(user);
     res.status(201).json({
         success: true,
         message: `Welcome, ${user.name}`,

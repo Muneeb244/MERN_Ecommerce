@@ -25,6 +25,7 @@ export const newUser = asyncMiddleware(
 
     user = await User.create({ name, email, photo, gender, _id, dob });
 
+    console.log(user)
     res.status(201).json({
       success: true,
       message: `Welcome, ${user.name}`,
@@ -42,6 +43,7 @@ export const getAllUsers = asyncMiddleware(async (req, res, next) => {
 });
 
 export const getUser = asyncMiddleware(async (req, res, next) => {
+
 
   const id = (req.params as {id:string}).id;
   const user = await User.findById(id);
