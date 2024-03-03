@@ -1,4 +1,4 @@
-import { User } from "./types";
+import { Product, User } from "./types";
 
 export type MessageResponse = {
     success: boolean,
@@ -16,4 +16,9 @@ export type CustomError = {
   export type userResponse = {
       success: boolean,
       user: User
+  }
+
+  export type AllProductResponse = {
+      success: boolean,
+      products: Product[]
   }

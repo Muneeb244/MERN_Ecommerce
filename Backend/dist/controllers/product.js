@@ -13,6 +13,8 @@ export const getLatestProducts = asyncMiddleware(async (req, res, next) => {
         products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
         myCache.set("latest-product", JSON.stringify(products));
     }
+    // throw new Error("akjshfkla")
+    setTimeout(() => { }, 3000);
     return res.status(200).json({
         success: true,
         products,
