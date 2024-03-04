@@ -20,7 +20,6 @@ export const getLatestProducts = asyncMiddleware(async (req, res, next) => {
         products,
     });
 });
-//Revalidate on New,Update,Delete product, New Order
 export const getAllCategories = asyncMiddleware(async (req, res, next) => {
     let categories = [];
     if (myCache.has("categories"))
@@ -153,12 +152,12 @@ export const getAllProducts = asyncMiddleware(async (req, res) => {
         };
     if (price)
         baseQuery.price = {
-            $lte: Number(price),
+            $lte: parseInt(price),
         };
     if (category)
         baseQuery.category = category;
     const productsPromise = Product.find(baseQuery)
-        .sort(sort ? { price: sort === "asc" ? 1 : -1 } : undefined)
+        .sort(sort && { price: sort === "asc" ? 1 : -1 })
         .limit(limit)
         .skip(skip);
     const [products, filteredOnlyProducts] = await Promise.all([

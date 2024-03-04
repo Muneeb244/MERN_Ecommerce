@@ -22,7 +22,7 @@ export const getLatestProducts = asyncMiddleware(async (req, res, next) => {
   }
 
   // throw new Error("akjshfkla")
-  setTimeout(() => {},3000)
+  setTimeout(() => {}, 3000);
 
   return res.status(200).json({
     success: true,
@@ -30,7 +30,6 @@ export const getLatestProducts = asyncMiddleware(async (req, res, next) => {
   });
 });
 
-//Revalidate on New,Update,Delete product, New Order
 export const getAllCategories = asyncMiddleware(async (req, res, next) => {
   let categories = [];
 
@@ -200,12 +199,13 @@ export const getAllProducts = asyncMiddleware(
       };
     if (price)
       baseQuery.price = {
-        $lte: Number(price),
+        $lte: parseInt(price),
       };
+
     if (category) baseQuery.category = category;
 
     const productsPromise = Product.find(baseQuery)
-      .sort(sort ? { price: sort === "asc" ? 1 : -1 } : undefined)
+      .sort(sort && { price: sort === "asc" ? 1 : -1 })
       .limit(limit)
       .skip(skip);
 

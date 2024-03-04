@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import TableHOC from "../../components/admin/TableHOC";
 import { Column } from "react-table";
 import { Link } from "react-router-dom";
@@ -84,7 +84,7 @@ const Products = () => {
       <AdminSideBar />
 
       {/* main */}
-      <main>{isLoading ? <Skeleton /> : Table}</main>
+      <main>{isLoading ? <Skeleton length={15} /> : Table}</main>
       <Link to="/admin/product/new" className="create-product-btn">
         <FaPlus />
       </Link>

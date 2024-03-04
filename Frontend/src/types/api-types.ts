@@ -22,3 +22,19 @@ export type CustomError = {
       success: boolean,
       products: Product[]
   }
+  export type categoriesResponse = {
+      success: boolean,
+      categories: string[]
+  }
+
+  export type searchProductResponse = AllProductResponse & {
+    totalPage: number;
+}
+  
+export type searchProductsRequest = {
+    price: number;
+    page: number;
+    category: string;
+    sort: string;
+    search: string
+}
