@@ -1,23 +1,55 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import AdminSideBar from "../../../components/admin/AdminSideBar";
+import { useSelector } from "react-redux";
+import { userReducerInitialState } from "../../../types/reducer-types";
+import { useNewProductMutation } from "../../../redux/api/productAPI";
+import toast from "react-hot-toast";
+import { responseToast } from "../../../utils/features";
+import { useNavigate } from "react-router-dom";
 
 const NewProduct = () => {
-  const [name, setName] = useState<string>("");
-  const [price, setPrice] = useState<number>();
-  const [stock, setStock] = useState<number>();
-  const [photo, setPhoto] = useState<string>("");
+  const {user} = useSelector(
+    (state: { userReducer: userReducerInitialState }) => state.userReducer
+  );
 
-  const changeImageHandler = (e:ChangeEvent<HTMLInputElement>) => {
-    
-    const file:File|undefined = e.target.files?.[0];
+  const [name, setName] = useState<string>("");
+  const [price, setPrice] = useState<number>(1000);
+  const [stock, setStock] = useState<number>(1);
+  const [photo, setPhoto] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+
+  const [newProduct] = useNewProductMutation()
+  const navigate = useNavigate()
+
+  const changeImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const file: File | undefined = e.target.files?.[0];
 
     const reader = new FileReader();
-    if(file) {
+    if (file) {
       reader.readAsDataURL(file);
       reader.onloadend = () => {
-        if(typeof reader.result === "string") setPhoto(reader.result);
-      }
+        if (typeof reader.result === "string") setPhoto(reader.result);
+      };
     }
+  };
+
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if(!name || !price || !stock || !photo) toast.error("Enter all fields")
+
+    const formData = new FormData()
+
+    formData.set("photo", photo);
+    formData.set("name", name);
+    formData.set("price", price.toString());
+    formData.set("stock", stock.toString());
+    formData.set("category", category);
+
+
+    const res = await newProduct({id: user?._id!, formData});
+
+    responseToast(res,navigate, "/admin/product")
+
   }
 
   return (
@@ -28,7 +60,7 @@ const NewProduct = () => {
       {/* main */}
       <main className="product-management">
         <article>
-          <form action="">
+          <form onSubmit={submitHandler}>
             <h2>New Product</h2>
             <div>
               <label htmlFor="">Name</label>
@@ -61,17 +93,21 @@ const NewProduct = () => {
               />
             </div>
             <div>
-              <label htmlFor="">Photo</label>
+              <label>Category</label>
               <input
                 required
-                type="file"
-                onChange={changeImageHandler}
+                type="text"
+                placeholder="eg. laptop, camera etc"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
               />
             </div>
-            {
-              photo && <img src={photo} alt="New Image" />
-            }
-            <button type="submit" >Create</button>
+            <div>
+              <label htmlFor="">Photo</label>
+              <input required type="file" onChange={changeImageHandler} />
+            </div>
+            {photo && <img src={photo} alt="New Image" />}
+            <button type="submit">Create</button>
           </form>
         </article>
       </main>

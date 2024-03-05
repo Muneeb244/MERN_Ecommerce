@@ -10,6 +10,8 @@ import ErrorHandler from "../utils/utility-class.js";
 import { rm } from "fs";
 import { myCache } from "../app.js";
 import { invalidatesCache } from "../utils/features.js";
+import { singleUpload } from "../middlewares/multer.js";
+import multer from "multer";
 
 //Revalidate on New,Update,Delete product, New Order
 export const getLatestProducts = asyncMiddleware(async (req, res, next) => {
@@ -88,9 +90,21 @@ export const newProduct = asyncMiddleware(
     res: Response,
     next: NextFunction
   ) => {
+
+    // singleUpload(req, res, function (err) {
+    //   if (err instanceof multer.MulterError) {
+    //     console.log("from chk", err)
+    //   } else if (err) {
+    //     // An unknown error occurred when uploading.
+    //     console.log("from chk koi or", err)
+    //   }
+    //   console.log(err)
+    // })
+
     const { name, price, stock, category } = req.body;
 
     const photo = req.file;
+    // console.log("from new product",name, price, stock, category, photo)
 
     if (!photo) return next(new ErrorHandler("Please add photo", 400));
 
@@ -189,6 +203,7 @@ export const getAllProducts = asyncMiddleware(
     const page = Number(req.query.page) || 1;
     const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
     const skip = limit * (page - 1);
+
 
     const baseQuery: BaseQuery = {};
 

@@ -5,6 +5,7 @@ import { asyncMiddleware } from "./asyncMidleware.js";
 export const adminOnly = asyncMiddleware( async (req, res, next) => {
     const {id} = req.query;
 
+
     if(!id) return next(new ErrorHandler(" admin authorized only", 401))
 
     const user = await User.findById(id);

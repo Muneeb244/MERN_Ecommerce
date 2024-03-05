@@ -38,3 +38,23 @@ export type searchProductsRequest = {
     sort: string;
     search: string
 }
+
+export type ProductResponse = {
+    success: boolean,
+    product: Product
+}
+
+export type NewProductRequest = {
+    id: string;
+    formData: FormData;
+  };
+
+export type updateProductRequest = {
+    userId: string;
+    productId: string;
+    formData: FormData;
+}
+export type deleteProductRequest = {
+    userId: string;
+    productId: string;
+}

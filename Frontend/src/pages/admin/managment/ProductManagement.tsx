@@ -1,42 +1,95 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import AdminSideBar from "../../../components/admin/AdminSideBar";
+import { useSelector } from "react-redux";
+import { userReducerInitialState } from "../../../types/reducer-types";
+import {
+  useDeleteProductMutation,
+  useProductDetailsQuery,
+  useUpdateProductMutation,
+} from "../../../redux/api/productAPI";
+import { useNavigate, useParams } from "react-router-dom";
+import { server } from "../../../redux/store";
+import { Skeleton } from "../../../components/Loading";
+import { responseToast } from "../../../utils/features";
+import { FaTrash } from "react-icons/fa";
 
 const ProductManagement = () => {
+  const { user } = useSelector(
+    (state: { userReducer: userReducerInitialState }) => state.userReducer
+  );
 
-  const img =
-  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2hvZXN8ZW58MHx8MHx8&w=1000&q=804";
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const [name, setName] = useState<string>("Puma shoes");
-  const [price, setPrice] = useState<number>(2000);
-  const [stock, setStock] = useState<number>(10);
-  const [photo, setPhoto] = useState<string>(img);
+  const { data, isLoading } = useProductDetailsQuery(id!);
+
+  const { price, photo, name, stock, category } = data?.product || {
+    photo: "",
+    category: "",
+    name: "",
+    price: 0,
+    stock: 0,
+  };
 
   const [nameUpdate, setNameUpdate] = useState<string>(name);
   const [priceUpdate, setPriceUpdate] = useState<number>(price);
   const [stockUpdate, setStockUpdate] = useState<number>(stock);
-  const [photoUpdate, setPhotoUpdate] = useState<string>(photo);
+  const [photoUpdate, setPhotoUpdate] = useState<string>("");
+  const [categoryUpdate, setCategoryUpdate] = useState<string>(category);
 
-  const changeImageHandler = (e:ChangeEvent<HTMLInputElement>) => {
-    
-    const file:File|undefined = e.target.files?.[0];
+  const [updateProduct] = useUpdateProductMutation();
+  const [deleteProduct] = useDeleteProductMutation();
+
+  const changeImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const file: File | undefined = e.target.files?.[0];
 
     const reader = new FileReader();
-    if(file) {
+    if (file) {
       reader.readAsDataURL(file);
       reader.onloadend = () => {
-        if(typeof reader.result === "string") setPhotoUpdate(reader.result);
-      }
+        if (typeof reader.result === "string") setPhotoUpdate(reader.result);
+      };
     }
-  }
+  };
 
-  const submitHandler = (e:FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setName(nameUpdate);
-    setPrice(priceUpdate);
-    setStock(stockUpdate);
-    setPhoto(photoUpdate);
-    
-  }
+
+    const formData = new FormData();
+
+    if (nameUpdate) formData.set("name", nameUpdate);
+    if (priceUpdate) formData.set("price", priceUpdate.toString());
+    if (stockUpdate !== undefined)
+      formData.set("stock", stockUpdate.toString());
+    if (photoUpdate) formData.set("photo", photoUpdate);
+    if (categoryUpdate) formData.set("category", category);
+
+    const res = await updateProduct({
+      formData,
+      userId: user?._id!,
+      productId: data?.product._id!,
+    });
+
+    responseToast(res, navigate, "/admin/products");
+  };
+
+  const deleteHandler = async () => {
+    const res = await deleteProduct({
+      userId: user?._id!,
+      productId: data?.product._id!,
+    });
+
+    responseToast(res, navigate, "/admin/products");
+  };
+
+  useEffect(() => {
+    if (data) {
+      setNameUpdate(data?.product.name);
+      setPriceUpdate(data?.product.price);
+      setStockUpdate(data?.product.stock);
+      setCategoryUpdate(data?.product.category);
+    }
+  }, [data]);
 
   return (
     <div className="admin-container">
@@ -45,75 +98,82 @@ const ProductManagement = () => {
 
       {/* main */}
       <main className="product-management">
+        {/* image section */}
 
-    {/* image section */}
+        {isLoading ? (
+          <Skeleton length={20} />
+        ) : (
+          <>
+            <section>
+              <strong>ID - {data?.product._id}</strong>
+              <img src={`${server}/${photo}`} alt="product" />
+              <p>{name}</p>
+              {stock > 0 ? (
+                <span className="green">{stock} Available</span>
+              ) : (
+                <span className="red">Not Available</span>
+              )}
+              <h3>${price}</h3>
+            </section>
 
-    <section>
-      <strong>ID - adfafdasf</strong>
-      <img src={photo} alt="product" />
-      <p>{name}</p>
-      {
-        stock > 0 ? (
-          <span className="green">{stock} Available</span>
-        ) :
-        (
-          <span className="red">Not Available</span>
-        )
-      }
-      <h3>${price}</h3>
-    </section>
-
-        <article>
-          <form onSubmit={submitHandler} >
-            <h2>Manage</h2>
-            <div>
-              <label htmlFor="">Name</label>
-              <input
-                required
-                type="text"
-                placeholder="name"
-                value={nameUpdate}
-                onChange={(e) => setNameUpdate(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="">Price</label>
-              <input
-                required
-                type="number"
-                placeholder="price"
-                value={priceUpdate}
-                onChange={(e) => setPriceUpdate(Number(e.target.value))}
-              />
-            </div>
-            <div>
-              <label htmlFor="">Stock</label>
-              <input
-                required
-                type="number"
-                placeholder="stock"
-                value={stockUpdate}
-                onChange={(e) => setStockUpdate(Number(e.target.value))}
-              />
-            </div>
-            <div>
-              <label htmlFor="">Photo</label>
-              <input
-                required
-                type="file"
-                onChange={changeImageHandler}
-              />
-            </div>
-            {
-              photoUpdate && <img src={photoUpdate} alt="New Image" />
-            }
-            <button type="submit" >Update</button>
-          </form>
-        </article>
+            <article>
+              <button className="product-delete-btn" onClick={deleteHandler}>
+                <FaTrash />
+              </button>
+              <form onSubmit={submitHandler}>
+                <h2>Manage</h2>
+                <div>
+                  <label htmlFor="">Name</label>
+                  <input
+                    type="text"
+                    placeholder="name"
+                    value={nameUpdate}
+                    onChange={(e) => setNameUpdate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="">Price</label>
+                  <input
+                    type="number"
+                    placeholder="price"
+                    value={priceUpdate}
+                    onChange={(e) => setPriceUpdate(Number(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="">Stock</label>
+                  <input
+                    type="number"
+                    placeholder="stock"
+                    value={stockUpdate}
+                    onChange={(e) => {
+                      console.log(stockUpdate)
+                      setStockUpdate(Number(e.target.value))
+                    }}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="">Category</label>
+                  <input
+                    type="text"
+                    placeholder="eg. laptop, camera etc"
+                    value={categoryUpdate}
+                    onChange={(e) => setCategoryUpdate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="">Photo</label>
+                  <input type="file" onChange={changeImageHandler} />
+                </div>
+                {photoUpdate && <img src={photoUpdate} alt="New Image" />}
+                <button type="submit">Update</button>
+              </form>
+            </article>
+          </>
+        )}
       </main>
     </div>
   );
 };
 
-
-export default ProductManagement
+export default ProductManagement;

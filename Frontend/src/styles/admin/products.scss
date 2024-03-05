@@ -20,53 +20,66 @@
   }
 }
 
+.product-delete-btn {
+  background-color: rgb(56, 56, 56);
+  color: white;
+  font-size: 1.2rem;
+  @include square(2.5rem);
+  @include flex;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  position: absolute;
+  top: -1.2rem;
+  right: -1.2rem;
+}
+
 .product-management {
-    @include flex(row, center, center);
+  @include flex(row, center, center);
 
-    > section {
-      overflow-y: auto;
-      width: 100%;
-      height: 90vh;
-      max-width: 500px;
-      box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.216);
-      background-color: white;
-      padding: 5rem;
-      @include flex(column, unset, unset);
-      position: relative;
-      border-radius: 5px;
-      
-      > h2 {
-        @include heading(2px);
-        text-align: center;
-      }
+  > section {
+    overflow-y: auto;
+    width: 100%;
+    height: 90vh;
+    max-width: 500px;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.216);
+    background-color: white;
+    padding: 5rem;
+    @include flex(column, unset, unset);
+    position: relative;
+    border-radius: 5px;
 
-      > img {
-        @include square(100%);
-        object-fit: cover;
-      }
-
-      > strong {
-        font-weight: 300;
-      }
-
-      > span {
-        position: absolute;
-        right: 2rem;
-        top: 2rem;
-      }
-
-      > p {
-        text-align: center;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-      }
-
-      > h3 {
-        text-align: center;
-        font-size: 2rem;
-      }
-
+    > h2 {
+      @include heading(2px);
+      text-align: center;
     }
+
+    > img {
+      @include square(100%);
+      object-fit: contain;
+    }
+
+    > strong {
+      font-weight: 300;
+    }
+
+    > span {
+      position: absolute;
+      right: 2rem;
+      top: 2rem;
+    }
+
+    > p {
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    > h3 {
+      text-align: center;
+      font-size: 2rem;
+    }
+  }
 
   > article {
     height: 90vh;
@@ -76,7 +89,8 @@
     background-color: white;
     border-radius: 5px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.216);
-    
+    position: relative;
+
     > form {
       @include flex(column, unset, center, 2rem);
 
@@ -102,14 +116,19 @@
 
         > input {
           border-radius: 5px;
-          @include inputStyle(100%, 1rem, unset, 1px solid rgba(13,13,13, 0.196));
+          @include inputStyle(
+            100%,
+            1rem,
+            unset,
+            1px solid rgba(13, 13, 13, 0.196)
+          );
+          border-radius: 5px;
         }
       }
-
       > button {
         padding: 1rem;
         border: none;
-        background-color: rgb(5,107,224);
+        background-color: rgb(5, 107, 224);
         color: white;
         width: 100%;
         border-radius: 5px;
@@ -119,7 +138,7 @@
     }
   }
 
-  .shipping-info-card{
+  .shipping-info-card {
     > h1 {
       text-align: center;
       @include heading(2px);
@@ -139,22 +158,21 @@
       margin: 1.2rem 0;
       padding: 1rem;
       border: none;
-      background-color: rgb(5,107,224);
+      background-color: rgb(5, 107, 224);
       color: white;
       width: 100%;
       border-radius: 5px;
       font-size: 1.1rem;
       cursor: pointer;
-      &:hover{
-        opacity: 0.8s
+      &:hover {
+        opacity: 0.8s;
       }
     }
-
-}
+  }
 }
 
 .transation-product-card {
-  @include flex(row,unset,center,1rem);
+  @include flex(row, unset, center, 1rem);
 
   > img {
     @include square(4rem);
