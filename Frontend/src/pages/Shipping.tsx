@@ -1,10 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { cartReducerInitialState } from "../types/reducer-types";
 
 const Shipping = () => {
+  const { cartItems } =
+    useSelector(
+      (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
+    );
 
-    const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(cartItems.length <= 0) return navigate("/cart")
+  },[cartItems])
 
   const [shippingInfo, setShippingInfo] = useState({
     address: "",
@@ -14,13 +24,15 @@ const Shipping = () => {
     pinCode: "",
   });
 
-  const changeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement >) => {
-    setShippingInfo(prev=> ({...prev, [e.target.name]:e.target.value}))
+  const changeHandler = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setShippingInfo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   return (
     <div className="shipping">
-      <button className="back-btn" onClick={() => navigate("/cart")} >
+      <button className="back-btn" onClick={() => navigate("/cart")}>
         <BiArrowBack />
       </button>
 
@@ -57,8 +69,8 @@ const Shipping = () => {
           value={shippingInfo.country}
           onChange={changeHandler}
         >
-            <option value="">Select Country</option>
-            <option value="pakistan">Pakistan</option>
+          <option value="">Select Country</option>
+          <option value="pakistan">Pakistan</option>
         </select>
 
         <input
