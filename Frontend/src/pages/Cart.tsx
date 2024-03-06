@@ -1,59 +1,109 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { VscError } from "react-icons/vsc";
-import CartItems from "../components/CartItems";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-
-const cartItems = [
-  {
-    productId: "afadsf",
-    photo:
-      "https://d1iv6qgcmtzm6l.cloudfront.net/products/lg_npXwHYuAuabxaCdxYw56ouORuEsgAhrczzoCmEOz.jpg",
-    name: "Macbook",
-    price: 3000,
-    quantity: 4,
-    stock: 10,
-  },
-];
-const subtotal = 4000;
-const tax = Math.round(subtotal * 0.8);
-const shippingCharges = 200;
-const discount = 300;
-const total = subtotal + shippingCharges + tax;
+import CartItems from "../components/CartItems";
+import {
+  addToCart,
+  calculatePrice,
+  discountApplied,
+  removeCartitem,
+} from "../redux/reducer/cartReducer";
+import { cartReducerInitialState } from "../types/reducer-types";
+import { CartItem } from "../types/types";
+import axios from "axios";
+import { server } from "../redux/store";
 
 const Cart = () => {
+  const { cartItems, subtotal, total, tax, shippingCharges, discount } =
+    useSelector(
+      (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
+    );
+
+  const dispatch = useDispatch();
+
   const [couponCode, setCouponCode] = useState<string>("");
   const [isValidCouponCode, setIsValidCouponCode] = useState<boolean>(false);
 
+  const incrementHandler = (cartItem: CartItem) => {
+    if (cartItem.quantity >= cartItem.stock)
+      return toast.error("Max quantity reached");
+
+    dispatch(addToCart({ ...cartItem, quantity: cartItem.quantity + 1 }));
+  };
+
+  const decrementHandler = (cartItem: CartItem) => {
+    if (cartItem.quantity <= 1)
+      return toast.error("Press delete to remove item");
+
+    dispatch(addToCart({ ...cartItem, quantity: cartItem.quantity - 1 }));
+  };
+
+  const removeHandler = (productId: string) => {
+    dispatch(removeCartitem(productId));
+  };
+
   useEffect(() => {
+    const { token, cancel } = axios.CancelToken.source();
+
     const timeoutId = setTimeout(() => {
+      axios
+        .get(`${server}/api/v1/payment/discount?coupon=${couponCode}`, {
+          cancelToken: token,
+        })
+        .then((res) => {
+          dispatch(discountApplied(res.data.discount));
+          setIsValidCouponCode(true);
+          dispatch(calculatePrice());
+        })
+        .catch(() => {
+          dispatch(discountApplied(0));
+          setIsValidCouponCode(false);
+          dispatch(calculatePrice());
+        });
+
       if (Math.random() > 0.5) setIsValidCouponCode(true);
       else setIsValidCouponCode(false);
-    }, 1000);
+    }, 500);
     return () => {
       clearTimeout(timeoutId);
+      cancel();
       setIsValidCouponCode(false);
     };
   }, [couponCode]);
 
+  useEffect(() => {
+    dispatch(calculatePrice());
+  }, [cartItems]);
+
   return (
     <div className="cart">
       <main>
-        { cartItems.length > 0 ? cartItems.map((i, index) => (
-          <CartItems key={index} cartItem={i} />
-        )) : <h1>No Items added</h1>
-        
-        }
+        {cartItems.length > 0 ? (
+          cartItems.map((i, index) => (
+            <CartItems
+              incrementHandler={incrementHandler}
+              decrementHandler={decrementHandler}
+              removeHandler={removeHandler}
+              key={index}
+              cartItem={i}
+            />
+          ))
+        ) : (
+          <h1>No Items added</h1>
+        )}
       </main>
 
       <aside>
-        <p>Subtotal: {subtotal}rs</p>
-        <p>Shipping Charges:{shippingCharges}rs</p>
-        <p>Tax Charges: {tax}rs</p>
+        <p>Subtotal: Rs.{subtotal}</p>
+        <p>Shipping Charges: Rs.{shippingCharges}</p>
+        <p>Tax: Rs.{tax}</p>
         <p>
-          Discount: <em className="red"> - {discount}rs</em>
+          Discount: <em className="red"> - Rs.{discount}</em>
         </p>
         <p>
-          <b>Total: {total}rs</b>
+          <b>Total: Rs.{total}</b>
         </p>
         <input
           type="text"
@@ -65,7 +115,7 @@ const Cart = () => {
         {couponCode &&
           (isValidCouponCode ? (
             <span className="green">
-              {discount}rs off using the
+              Rs.{discount} off using code
               <code>{couponCode}</code>
             </span>
           ) : (
@@ -75,9 +125,7 @@ const Cart = () => {
             </span>
           ))}
 
-          {
-            cartItems.length > 0 && <Link to={"/shipping"}>Checkout</Link>
-          }
+        {cartItems.length > 0 && <Link to={"/shipping"}>Checkout</Link>}
       </aside>
     </div>
   );

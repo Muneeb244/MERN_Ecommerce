@@ -41,7 +41,7 @@ export const discount = asyncMiddleware(async (req, res, next) => {
 
   return res.status(201).json({
     success: true,
-    dicount: discount.amount,
+    discount: discount.amount,
   });
 });
 

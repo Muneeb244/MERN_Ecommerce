@@ -49,7 +49,6 @@ $color3: rgb(0, 104, 136);
 @import "./admin/apps";
 @import "./admin/mediaquery";
 
-
 .container {
   max-width: 1367px;
   width: 100%;
@@ -68,18 +67,37 @@ $color3: rgb(0, 104, 136);
   text-align: center;
 }
 
-
-.header{
+.header {
   @include flex(row, flex-end, stretch, 1.2rem);
   padding: 1rem;
+
+  .item-number-parent{
+    position: relative;
+  }
 
   a {
     color: $color2;
     letter-spacing: 2px;
     font-size: 1.2rem;
 
-    &:hover{
-      color: $color3
+    &:hover {
+      color: $color3;
+    }
+
+    .cart-item-number {
+      background-color: darkblue;
+      color: $color1;
+      font-size: 1rem;
+      padding: 5px;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      text-align: center;
+      line-height: 10px;
+      position: absolute;
+      top: -10px;
+      left: -10px;
     }
   }
 
@@ -89,8 +107,8 @@ $color3: rgb(0, 104, 136);
     cursor: pointer;
     background-color: transparent;
 
-    &:hover{
-      color: $color3
+    &:hover {
+      color: $color3;
     }
   }
 
@@ -104,26 +122,10 @@ $color3: rgb(0, 104, 136);
     top: 8%;
 
     > div {
-      @include flex(column, flex-start,center, 2.5rem);
+      @include flex(column, flex-start, center, 2.5rem);
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .admin-container {
   @include grid(1fr 4fr, 2rem);
@@ -320,5 +322,4 @@ $color3: rgb(0, 104, 136);
   100% {
     opacity: 0.6;
   }
-  
 }

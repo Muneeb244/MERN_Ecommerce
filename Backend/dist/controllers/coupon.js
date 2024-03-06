@@ -32,7 +32,7 @@ export const discount = asyncMiddleware(async (req, res, next) => {
         return next(new ErrorHandler("Invalid coupon code", 400));
     return res.status(201).json({
         success: true,
-        dicount: discount.amount,
+        discount: discount.amount,
     });
 });
 export const allCoupons = asyncMiddleware(async (req, res, next) => {

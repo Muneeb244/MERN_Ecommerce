@@ -5,6 +5,8 @@ import { User } from "../types/types";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { cartReducerInitialState } from "../types/reducer-types";
 
 
 interface PropsType {
@@ -12,6 +14,11 @@ interface PropsType {
 }
 
 const Header = ({user}:PropsType) => {
+
+  const { cartItems } =
+    useSelector(
+      (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
+    );
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -31,8 +38,9 @@ const Header = ({user}:PropsType) => {
       <Link onClick={() => setIsOpen(false)} to={"/search"}>
         <FaSearch />
       </Link>
-      <Link onClick={() => setIsOpen(false)} to={"/cart"}>
+      <Link className="item-number-parent" onClick={() => setIsOpen(false)} to={"/cart"}>
         <FaShoppingBag />
+        <span className="cart-item-number" >{cartItems.length}</span>
       </Link>
 
       {user?._id ? (
