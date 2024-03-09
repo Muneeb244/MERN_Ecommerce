@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { cartReducerInitialState } from "../../types/reducer-types";
-import { CartItem } from "../../types/types";
+import { CartItem, ShippingInfo } from "../../types/types";
 
 const initialState: cartReducerInitialState = {
   loading: false,
@@ -49,12 +49,24 @@ export const cartReducer = createSlice({
 
       state.shippingCharges = state.subtotal > 1000 ? 0 : 200;
       state.tax = Math.round(state.subtotal * 0.18);
-      state.total = state.subtotal + state.tax +  state.shippingCharges - state.discount;
+      state.total =
+        state.subtotal + state.tax + state.shippingCharges - state.discount;
     },
     discountApplied: (state, action: PayloadAction<number>) => {
-        state.discount = action.payload
-      },
+      state.discount = action.payload;
+    },
+    saveShippingInfo: (state, action: PayloadAction<ShippingInfo>) => {
+      state.shippingInfo = action.payload;
+    },
+    resetCart: () => initialState,
   },
 });
 
-export const { addToCart, removeCartitem, calculatePrice, discountApplied } = cartReducer.actions;
+export const {
+  addToCart,
+  removeCartitem,
+  calculatePrice,
+  discountApplied,
+  saveShippingInfo,
+  resetCart,
+} = cartReducer.actions;

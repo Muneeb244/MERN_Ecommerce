@@ -73,7 +73,7 @@ export type NewOrderRequest = {
 
 export type updateOrderRequest = {
   userId: string;
-  orderId: StorageManager;
+  orderId: string;
 };
 
 export type AllOrdersResponse = {
@@ -83,5 +83,5 @@ export type AllOrdersResponse = {
 
 export type OrderDetailResponse = {
   success: boolean;
-  orders: Order[];
+  order: Order;
 };

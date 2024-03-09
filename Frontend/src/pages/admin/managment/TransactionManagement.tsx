@@ -1,59 +1,76 @@
-import { useState } from "react";
+import { FaTrash } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Skeleton } from "../../../components/Loading";
 import AdminSideBar from "../../../components/admin/AdminSideBar";
-import { OrderItemType, OrderType } from "../types";
-import { Link } from "react-router-dom";
+import { useDeleteOrderMutation, useOrderDetailsQuery, useUpdateOrderMutation } from "../../../redux/api/orderAPI";
+import { server } from "../../../redux/store";
+import { userReducerInitialState } from "../../../types/reducer-types";
+import { Order } from "../../../types/types";
+import { responseToast } from "../../../utils/features";
+import { OrderItemType } from "../types";
 
-const img =
-  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2hvZXN8ZW58MHx8MHx8&w=1000&q=804";
-
-const orderItems: OrderItemType[] = [
-  {
-    name: "Puma Shoes",
-    photo: img,
-    _id: "asdsaasdas",
-    quantity: 4,
-    price: 2000,
+const defaultData: Order = {
+  shippingInfo: {
+    address: "",
+    city: "",
+    state: "",
+    country: "",
+    pinCode: "",
   },
-];
+  status: "",
+  subtotal: 0,
+  discount: 0,
+  shippingCharges: 0,
+  tax: 0,
+  total: 0,
+  orderItems: [],
+  user: { name: "", _id: "" },
+  _id: "",
+};
 
 const TransactionManagement = () => {
-  const [order, setOrder] = useState<OrderType>({
-    name: "Abhishek Singh",
-    address: "77 Black Street",
-    city: "Neyword",
-    state: "Nevada",
-    country: "India",
-    pinCode: 2434341,
-    status: "Processing",
-    subtotal: 4000,
-    discount: 1200,
-    shippingCharges: 0,
-    tax: 200,
-    total: 4000 + 200 + 0 - 1200,
-    orderItems,
-    _id: "asdnasjdhbn",
-  });
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const { user } = useSelector(
+    (state: { userReducer: userReducerInitialState }) => state.userReducer
+  );
+
+  const { isLoading, data, isError } = useOrderDetailsQuery(id!);
 
   const {
-    name,
-    address,
-    city,
-    country,
-    state,
-    subtotal,
-    shippingCharges,
-    tax,
-    discount,
-    total,
+    shippingInfo: { address, city, state, country, pinCode },
+    orderItems,
+    user: { name },
     status,
-  } = order;
+    tax,
+    subtotal,
+    total,
+    discount,
+    shippingCharges,
+  } = data?.order || defaultData;
 
-  const updateHandler = () => {
-    setOrder(prev => ({
-      ...prev,
-      status: prev.status === "Processing" ? "Shipped" : "Delivered",
-    }))
-  }
+  if (isError) return <Navigate to={"/404"} />;
+
+  const [updateOrder] = useUpdateOrderMutation()
+  const [deleteOrder] = useDeleteOrderMutation()
+
+  const updateHandler = async () => {
+    const res = await updateOrder({
+      userId: user?._id!,
+      orderId: data?.order._id!,
+    });
+    responseToast(res, navigate, "/admin/transaction")
+  };
+
+  const deleteHandler = async () => {
+    const res = await deleteOrder({
+      userId: user?._id!,
+      orderId: data?.order._id!,
+    });
+    responseToast(res, navigate, "/admin/transaction")
+  };
 
   return (
     <div className="admin-container">
@@ -62,51 +79,66 @@ const TransactionManagement = () => {
 
       {/* main */}
       <main className="product-management">
-        <section style={{
-          padding: "2rem",
-        }}>
-          <h2>Order Items</h2>
-          {order.orderItems.map((i) => (
-            <ProductCard
-              name={i.name}
-              photo={i.photo}
-              _id={i._id}
-              quantity={i.quantity}
-              price={i.price}
-            />
-          ))}
-        </section>
+        {isLoading ? (
+          <Skeleton />
+        ) : (
+          <>
+            <section
+              style={{
+                padding: "2rem",
+              }}
+            >
+              <h2>Order Items</h2>
+              {orderItems.map((i) => (
+                <ProductCard
+                  name={i.name}
+                  photo={`${server}/${i.photo}`}
+                  _id={i._id}
+                  quantity={i.quantity}
+                  price={i.price}
+                />
+              ))}
+            </section>
 
-        <article className="shipping-info-card">
-          <h1>Order Info</h1>
-          <h5>User Info</h5>
-          <p>Name: {name}</p>
+            <article className="shipping-info-card">
+              <button className="product-delete-btn" onClick={deleteHandler}>
+                <FaTrash />
+              </button>
+              <h1>Order Info</h1>
+              <h5>User Info</h5>
+              <p>Name: {name}</p>
 
-          <p>Address: {`${address}, ${city}, ${state}, ${country}`}</p>
+              <p>Address: {`${address}, ${city}, ${state}, ${country} ${pinCode}`}</p>
 
-          <h5>Amount Info</h5>
-          <p>Subtotal: {subtotal}</p>
-          <p>Shipping Charges: {shippingCharges}</p>
-          <p>Tax: {tax}</p>
-          <p>Discount: {discount}</p>
-          <p>Total: {total}</p>
+              <h5>Amount Info</h5>
+              <p>Subtotal: {subtotal}</p>
+              <p>Shipping Charges: {shippingCharges}</p>
+              <p>Tax: {tax}</p>
+              <p>Discount: {discount}</p>
+              <p>Total: {total}</p>
 
-          <h5>Status Info</h5>
-          <p>
-            Status:{" "}
-            <span
-              className={
-                state === "Delivered"
-                  ? "purple"
-                  : status === "Shipped"
-                  ? "green"
-                  : "red"
-              }
-            >{status}</span>
-          </p>
+              <h5>Status Info</h5>
+              <p>
+                Status:{" "}
+                <span
+                  className={
+                    state === "Delivered"
+                      ? "purple"
+                      : status === "Shipped"
+                      ? "green"
+                      : "red"
+                  }
+                >
+                  {status}
+                </span>
+              </p>
 
-          <button onClick={updateHandler} >Process Status</button>
-        </article>
+              <button onClick={updateHandler} className="process-button">
+                Process Status
+              </button>
+            </article>
+          </>
+        )}
       </main>
     </div>
   );

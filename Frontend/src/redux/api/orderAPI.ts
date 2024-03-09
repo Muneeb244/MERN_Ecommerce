@@ -3,6 +3,7 @@ import {
   AllOrdersResponse,
   MessageResponse,
   NewOrderRequest,
+  OrderDetailResponse,
   updateOrderRequest,
 } from "../../types/api-types";
 
@@ -31,7 +32,7 @@ export const orderAPI = createApi({
     deleteOrder: builder.mutation<MessageResponse, updateOrderRequest>({
       query: ({ userId, orderId }) => ({
         url: `${orderId}?id=${userId}`,
-        method: "PUT",
+        method: "DELETE",
       }),
       invalidatesTags: ["orders"],
     }),
@@ -43,7 +44,7 @@ export const orderAPI = createApi({
       query: (id) => `all?id=${id}`,
       providesTags: ["orders"],
     }),
-    orderDetails: builder.query<AllOrdersResponse, string>({
+    orderDetails: builder.query<OrderDetailResponse, string>({
       query: (id) => id,
       providesTags: ["orders"],
     }),
