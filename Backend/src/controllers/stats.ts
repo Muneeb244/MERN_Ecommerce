@@ -125,7 +125,7 @@ export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
 
     const changePercent = {
       revenue: calculatePercentage(thisMonthRevenue, lastMonthRevenue),
-      Product: calculatePercentage(
+      product: calculatePercentage(
         thisMonthUsers.length,
         lastMonthUsers.length
       ),
@@ -190,7 +190,7 @@ export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
         revenue: orderMonthlyRevenue,
       },
       genderRatio,
-      latesttransaction: modifyTransaction,
+      latestTransaction: modifyTransaction,
     };
 
     myCache.set(key, JSON.stringify(stats));
@@ -242,7 +242,7 @@ export const getPieCharts = asyncMiddleware(async (req, res, next) => {
       User.countDocuments({ role: "user" }),
     ]);
 
-    const orderFullFilment = {
+    const orderFullfillment = {
       processing: processingOrder,
       shipped: shippedOrder,
       deliveredOrder,
@@ -298,7 +298,7 @@ export const getPieCharts = asyncMiddleware(async (req, res, next) => {
     };
 
     charts = {
-      orderFullFilment,
+      orderFullfillment,
       productCategories,
       stockAvailability,
       revenueDistribution,
@@ -364,7 +364,7 @@ export const getBarCharts = asyncMiddleware(async (req, res, next) => {
 
     charts = {
       users: userCounts,
-      product: productCounts,
+      products: productCounts,
       orders: orderCounts,
     };
 
@@ -430,7 +430,7 @@ export const getLineCharts = asyncMiddleware(async (req, res, next) => {
 
     charts = {
       users: userCounts,
-      product: productCounts,
+      products: productCounts,
       discount,
       revenue,
     };

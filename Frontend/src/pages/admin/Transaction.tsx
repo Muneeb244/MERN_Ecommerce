@@ -7,8 +7,8 @@ import { Skeleton } from "../../components/Loading";
 import AdminSideBar from "../../components/admin/AdminSideBar";
 import TableHOC from "../../components/admin/TableHOC";
 import { useAllOrdersQuery } from "../../redux/api/orderAPI";
+import { RootState } from "../../redux/store";
 import { CustomError } from "../../types/api-types";
-import { userReducerInitialState } from "../../types/reducer-types";
 
 interface DataType {
   user: string;
@@ -47,9 +47,7 @@ const columns: Column<DataType>[] = [
 ];
 
 const Transaction = () => {
-  const { user } = useSelector(
-    (state: { userReducer: userReducerInitialState }) => state.userReducer
-  );
+  const { user } = useSelector((state: RootState) => state.userReducer);
 
   const { isLoading, data, isError, error } = useAllOrdersQuery(user?._id!);
   const [rows, setRows] = useState<DataType[]>([]);

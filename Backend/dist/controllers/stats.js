@@ -87,7 +87,7 @@ export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
         const lastMonthRevenue = lastMonthOrders.reduce((total, order) => total + (order.total || 0), 0);
         const changePercent = {
             revenue: calculatePercentage(thisMonthRevenue, lastMonthRevenue),
-            Product: calculatePercentage(thisMonthUsers.length, lastMonthUsers.length),
+            product: calculatePercentage(thisMonthUsers.length, lastMonthUsers.length),
             user: calculatePercentage(thisMonthProducts.length, lastMonthProducts.length),
             order: calculatePercentage(thisMonthOrders.length, lastMonthOrders.length),
         };
@@ -133,7 +133,7 @@ export const getDashboardStats = asyncMiddleware(async (req, res, next) => {
                 revenue: orderMonthlyRevenue,
             },
             genderRatio,
-            latesttransaction: modifyTransaction,
+            latestTransaction: modifyTransaction,
         };
         myCache.set(key, JSON.stringify(stats));
     } // else end
@@ -169,7 +169,7 @@ export const getPieCharts = asyncMiddleware(async (req, res, next) => {
             User.countDocuments({ role: "admin" }),
             User.countDocuments({ role: "user" }),
         ]);
-        const orderFullFilment = {
+        const orderFullfillment = {
             processing: processingOrder,
             shipped: shippedOrder,
             deliveredOrder,
@@ -208,7 +208,7 @@ export const getPieCharts = asyncMiddleware(async (req, res, next) => {
             customer: customerUsers,
         };
         charts = {
-            orderFullFilment,
+            orderFullfillment,
             productCategories,
             stockAvailability,
             revenueDistribution,
@@ -264,7 +264,7 @@ export const getBarCharts = asyncMiddleware(async (req, res, next) => {
         const orderCounts = getChartData({ length: 12, today, docArr: orders });
         charts = {
             users: userCounts,
-            product: productCounts,
+            products: productCounts,
             orders: orderCounts,
         };
         myCache.set(key, JSON.stringify(charts));
@@ -319,7 +319,7 @@ export const getLineCharts = asyncMiddleware(async (req, res, next) => {
         });
         charts = {
             users: userCounts,
-            product: productCounts,
+            products: productCounts,
             discount,
             revenue,
         };

@@ -1,114 +1,153 @@
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { Skeleton } from "../../../components/Loading";
 import AdminSideBar from "../../../components/admin/AdminSideBar";
 import { DoughnutChart, PieChart } from "../../../components/admin/Charts";
-import { categories } from "../../../assets/data.json";
+import { usePieQuery } from "../../../redux/api/dashboardAPI";
+import { RootState } from "../../../redux/store";
 
 const PieCharts = () => {
+  const { user } = useSelector((state: RootState) => state.userReducer);
+
+  const { isLoading, isError, data } = usePieQuery(user?._id!);
+
+  const charts = data?.charts!;
+
+  if (isError) return <Navigate to={"/admin/dashboard"} />
+
   return (
     <div className="admin-container">
       <AdminSideBar />
 
       <main className="chart-container">
         <h1>Pie & Donut Charts</h1>
-        <section>
-          <div>
-            <PieChart
-              labels={["Processing", "Shipped", "Delivered"]}
-              data={[12, 9, 13]}
-              backgroundColor={[
-                `hsl(110, 80%, 80%)`,
-                `hsl(110, 80%, 50%)`,
-                `hsl(110, 40%, 50%)`,
-              ]}
-              offset={[0, 0, 50]}
-            />
-          </div>
-          <h2>Order Fullfillmaent Ratio</h2>
-        </section>
+        {isLoading ? (
+          <Skeleton length={20} />
+        ) : (
+          <>
+            <section>
+              <div>
+                <PieChart
+                  labels={["Processing", "Shipped", "Delivered"]}
+                  data={[
+                    charts.orderFullfillment.processing,
+                    charts.orderFullfillment.shipped,
+                    charts.orderFullfillment.delivered,
+                  ]}
+                  backgroundColor={[
+                    `hsl(110, 80%, 80%)`,
+                    `hsl(110, 80%, 50%)`,
+                    `hsl(110, 40%, 50%)`,
+                  ]}
+                  offset={[0, 0, 50]}
+                />
+              </div>
+              <h2>Order Fullfillmaent Ratio</h2>
+            </section>
 
-        {/* donut chart */}
-        <section>
-          <div>
-            <DoughnutChart
-              labels={categories.map((i) => i.heading)}
-              data={categories.map((i) => i.value)}
-              backgroundColor={categories.map(
-                (i) => `hsl(${i.value * 4}, ${i.value}%, 50%)`
-              )}
-              offset={[0, 0, 0, 30]}
-            />
-          </div>
-          <h2>Product Categories Ratio</h2>
-        </section>
+            {/* donut chart */}
+            <section>
+              <div>
+                <DoughnutChart
+                  labels={charts.productCategories.map(
+                    (i) => Object.keys(i)[0]
+                  )}
+                  data={charts.productCategories.map(
+                    (i) => Object.values(i)[0]
+                  )}
+                  backgroundColor={charts.productCategories.map(
+                    (i) => `hsl(${Object.values(i)[0] * 4}, ${Object.values(i)[0]}%, 50%)`
+                  )}
+                  offset={[0, 0, 0, 30]}
+                />
+              </div>
+              <h2>Product Categories Ratio</h2>
+            </section>
 
-        <section>
-          <div>
-            <DoughnutChart
-              labels={["In Stock", "Out of Stock"]}
-              data={[40, 20]}
-              backgroundColor={["hsl(296, 80%, 40%)", "rgb(53, 162, 255)"]}
-              legends={false}
-              offset={[0, 80]}
-              cutout={"70%"}
-            />
-          </div>
-          <h2>Stock Availability</h2>
-        </section>
+            <section>
+              <div>
+                <DoughnutChart
+                  labels={["In Stock", "Out of Stock"]}
+                  data={[
+                    charts.stockAvailability.inStock,
+                    charts.stockAvailability.outOfStock,
+                  ]}
+                  backgroundColor={["hsl(296, 80%, 40%)", "rgb(53, 162, 255)"]}
+                  legends={false}
+                  offset={[0, 80]}
+                  cutout={"70%"}
+                />
+              </div>
+              <h2>Stock Availability</h2>
+            </section>
 
-        <section>
-          <div>
-            <DoughnutChart
-              labels={[
-                "Marketing Cost",
-                "Discount",
-                "Burnt",
-                "Production Cost",
-                "Net Margin",
-              ]}
-              data={[32, 18, 5, 20, 25]}
-              backgroundColor={[
-                "hsl(110,80%,40%)",
-                "hsl(19,80%,40%)",
-                "hsl(69,80%,40%)",
-                "hsl(300,80%,40%)",
-                "rgb(53, 162, 255)",
-              ]}
-              legends={false}
-              offset={[20, 30, 20, 30, 80]}
-            />
-          </div>
-          <h2>Stock Availability</h2>
-        </section>
+            <section>
+              <div>
+                <DoughnutChart
+                  labels={[
+                    "Marketing Cost",
+                    "Discount",
+                    "Burnt",
+                    "Production Cost",
+                    "Net Margin",
+                  ]}
+                  data={[
+                    charts.revenueDistribution.marketingCost,
+                    charts.revenueDistribution.discount,
+                    charts.revenueDistribution.burnt,
+                    charts.revenueDistribution.productionCost,
+                    charts.revenueDistribution.netMargin,
+                  ]}
+                  backgroundColor={[
+                    "hsl(110,80%,40%)",
+                    "hsl(19,80%,40%)",
+                    "hsl(69,80%,40%)",
+                    "hsl(300,80%,40%)",
+                    "rgb(53, 162, 255)",
+                  ]}
+                  legends={false}
+                  offset={[20, 30, 20, 30, 80]}
+                />
+              </div>
+              <h2>Stock Availability</h2>
+            </section>
 
-        <section>
-          <div>
-            <PieChart
-              labels={[
-                "Teenager(Below 20)",
-                "Adult (20-40)",
-                "Older (above 40)",
-              ]}
-              data={[30, 250, 70]}
-              backgroundColor={[
-                `hsl(10, ${80}%, 80%)`,
-                `hsl(10, ${80}%, 50%)`,
-                `hsl(10, ${40}%, 50%)`,
-              ]}
-              offset={[0, 0, 50]}
-            />
-          </div>
-          <h2>Users Age Group</h2>
-        </section>
+            <section>
+              <div>
+                <PieChart
+                  labels={[
+                    "Teenager(Below 20)",
+                    "Adult (20-40)",
+                    "Older (above 40)",
+                  ]}
+                  data={[
+                    charts.usersAgeGroup.teen,
+                    charts.usersAgeGroup.adult,
+                    charts.usersAgeGroup.old,
+                  ]}
+                  backgroundColor={[
+                    `hsl(10, ${80}%, 80%)`,
+                    `hsl(10, ${80}%, 50%)`,
+                    `hsl(10, ${40}%, 50%)`,
+                  ]}
+                  offset={[0, 0, 50]}
+                />
+              </div>
+              <h2>Users Age Group</h2>
+            </section>
 
-        <section>
-          <div>
-            <DoughnutChart
-              labels={["Admin", "Customers"]}
-              data={[40, 250]}
-              backgroundColor={[`hsl(335, 100%, 38%)`, "hsl(44, 98%, 50%)"]}
-              offset={[0, 80]}
-            />
-          </div>
-        </section>
+            <section>
+              <div>
+                <DoughnutChart
+                  labels={["Admin", "Customers"]}
+                  data={[charts.adminCustomer.admin, charts.adminCustomer.customer]}
+                  backgroundColor={[`hsl(335, 100%, 38%)`, "hsl(44, 98%, 50%)"]}
+                  offset={[0, 80]}
+                />
+              </div>
+            </section>
+          </>
+        )}
       </main>
     </div>
   );

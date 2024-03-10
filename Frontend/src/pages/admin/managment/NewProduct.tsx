@@ -35,7 +35,7 @@ const NewProduct = () => {
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if(!name || !price || !stock || !photo) toast.error("Enter all fields")
+    if(!name || !price || stock < 0 || !photo) toast.error("Enter all fields")
 
     const formData = new FormData()
 

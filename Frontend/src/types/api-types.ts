@@ -1,8 +1,12 @@
-import { CartItem, Order, Product, ShippingInfo, User } from "./types";
+import { Bar, CartItem, Line, Order, Pie, Product, ShippingInfo, Stats, User } from "./types";
 
 export type MessageResponse = {
   success: boolean;
   message: string;
+};
+export type AllUsersResponse = {
+  success: boolean;
+  users: User[];
 };
 
 export type CustomError = {
@@ -40,9 +44,34 @@ export type searchProductsRequest = {
   search: string;
 };
 
+export type AllOrdersResponse = {
+  success: boolean;
+  orders: Order[];
+};
+
 export type ProductResponse = {
   success: boolean;
   product: Product;
+};
+
+export type statsResponse = {
+  success: boolean;
+  stats: Stats;
+};
+
+export type PieResponse = {
+  success: boolean;
+  charts: Pie;
+};
+
+export type BarResponse = {
+  success: boolean;
+  charts: Bar;
+};
+
+export type LineResponse = {
+  success: boolean;
+  charts: Line;
 };
 
 export type NewProductRequest = {
@@ -76,10 +105,10 @@ export type updateOrderRequest = {
   orderId: string;
 };
 
-export type AllOrdersResponse = {
-  success: boolean;
-  orders: Order[];
-};
+export type DeleteUserRequest = {
+  userId: string,
+  adminId: string
+}
 
 export type OrderDetailResponse = {
   success: boolean;
