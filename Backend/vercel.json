@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "name": "native-server",
+  "builds": [{ "src": "dist/app.js", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "dist/app.js" }]
+}
