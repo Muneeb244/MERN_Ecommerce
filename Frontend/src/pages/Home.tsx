@@ -22,6 +22,7 @@ const Home = () => {
 
   if (isError) toast.error("Cannot fetch Products");
 
+
   return (
     <div className="home">
       <section></section>

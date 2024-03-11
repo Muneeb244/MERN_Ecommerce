@@ -3,14 +3,7 @@ import { InvalidateCacheProps, OrderItemType } from "../types/types.js";
 import { Product } from "../models/product.js";
 import { myCache } from "../app.js";
 
-export const connectDB = (uri: string) => {
-  mongoose
-    .connect(uri, {
-      dbName: "Ecommerce",
-    })
-    .then((con) => console.log(`Connected to ${con.connection.host}`))
-    .catch((err) => console.log(err));
-};
+
 
 export const invalidatesCache = async ({
   product,

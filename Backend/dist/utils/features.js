@@ -1,14 +1,5 @@
-import mongoose from "mongoose";
 import { Product } from "../models/product.js";
 import { myCache } from "../app.js";
-export const connectDB = (uri) => {
-    mongoose
-        .connect(uri, {
-        dbName: "Ecommerce",
-    })
-        .then((con) => console.log(`Connected to ${con.connection.host}`))
-        .catch((err) => console.log(err));
-};
 export const invalidatesCache = async ({ product, order, admin, userId, orderId, productId, }) => {
     if (product) {
         const productKeys = [

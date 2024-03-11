@@ -1,23 +1,22 @@
+import cors from "cors";
+import { config } from "dotenv";
 import express from "express";
+import mongoose from "mongoose";
 import morgan from "morgan";
 import NodeCache from "node-cache";
-import { config } from "dotenv";
 import Stripe from "stripe";
-import cors from "cors";
 // import routes
-import userRoute from "./routes/user.js";
-import productRoute from "./routes/products.js";
 import orderRoute from "./routes/orders.js";
 import paymentRoute from "./routes/payment.js";
+import productRoute from "./routes/products.js";
 import DashboardRoute from "./routes/stats.js";
+import userRoute from "./routes/user.js";
 // import middleware
 import errorHandler from "./middlewares/errorHandler.js";
-import { connectDB } from "./utils/features.js";
 config({ path: "./.env" });
 const port = process.env.PORT || 4000;
 const mongo_URI = process.env.MONGO_URI || "";
 const stripeKey = process.env.STRIPEKEY || "";
-connectDB(mongo_URI);
 export const stripe = new Stripe(stripeKey);
 export const myCache = new NodeCache();
 const app = express();
@@ -34,6 +33,13 @@ app.use(errorHandler);
 app.get("/", (req, res) => {
     res.send("API working");
 });
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+mongoose.connect(mongo_URI, {
+    dbName: "Ecommerce",
+})
+    .then((con) => {
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+    console.log(`Connected to ${con.connection.host}`);
+})
+    .catch((err) => console.log(err));
