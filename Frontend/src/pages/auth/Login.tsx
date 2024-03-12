@@ -1,25 +1,24 @@
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
+import { useDispatch } from "react-redux";
 import { auth } from "../../firebase";
-import { useLoginMutation } from "../../redux/api/userAPI";
+import { getUser, useLoginMutation } from "../../redux/api/userAPI";
+import { userExist, userNotExist } from "../../redux/reducer/userReducer";
 import { CustomError } from "../../types/api-types";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [gender, setGender] = useState<string>("");
   const [date, setDate] = useState<string>("");
 
-
   const [login] = useLoginMutation();
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const loginHandler = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      const {user} = await signInWithPopup(auth,provider);
+      const { user } = await signInWithPopup(auth, provider);
 
       const res = await login({
         name: user.displayName!,
@@ -29,25 +28,21 @@ const Login = () => {
         role: "user",
         dob: date,
         _id: user.uid,
-      })
+      });
 
-      if("data" in res){
-        toast.success(res.data.message)
-        navigate("/")
+      if ("data" in res) {
+        toast.success(res.data.message);
+        const data = await getUser(user.uid);
+        dispatch(userExist(data?.user!));
+      } else {
+        const error = res.error as CustomError;
+        toast.error(error.data.error);
+        dispatch(userNotExist());
       }
-      else{
-        const error = res.error as FetchBaseQueryError
-        const message = (error.data as CustomError)
-        toast.error(message.data.error)
-        console.log(message.data.error)
-      }
-
     } catch (err) {
-      toast.error("Sign In failed")
-      console.log("from login console",err)
+      toast.error("Sign In failed");
     }
-
-  }
+  };
 
   return (
     <div className="login">
