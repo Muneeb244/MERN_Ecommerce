@@ -39,10 +39,12 @@ const Login = () => {
         const error = res.error as FetchBaseQueryError
         const message = (error.data as CustomError)
         toast.error(message.data.error)
+        console.log(message.data.error)
       }
 
     } catch (err) {
       toast.error("Sign In failed")
+      console.log("from login console",err)
     }
 
   }
