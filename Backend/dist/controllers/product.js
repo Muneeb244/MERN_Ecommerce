@@ -63,8 +63,18 @@ export const getSingleProduct = asyncMiddleware(async (req, res, next) => {
     });
 });
 export const newProduct = asyncMiddleware(async (req, res, next) => {
+    // singleUpload(req, res, function (err) {
+    //   if (err instanceof multer.MulterError) {
+    //     console.log("from chk", err)
+    //   } else if (err) {
+    //     // An unknown error occurred when uploading.
+    //     console.log("from chk koi or", err)
+    //   }
+    //   console.log(err)
+    // })
     const { name, price, stock, category } = req.body;
     const photo = req.file;
+    // console.log("from new product",name, price, stock, category, photo)
     if (!photo)
         return next(new ErrorHandler("Please add photo", 400));
     if (!name || !price || !stock || !category) {
