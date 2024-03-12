@@ -11,6 +11,7 @@ import { BarChart, DoughnutChart } from "../../components/admin/Charts";
 import DashboardTable from "../../components/admin/DashboardTable";
 import { useStatsQuery } from "../../redux/api/dashboardAPI";
 import { RootState } from "../../redux/store";
+import { getLastMonths } from "../../utils/features";
 
 const Dashboard = () => {
   const { user } = useSelector((state: RootState) => state.userReducer);
@@ -19,9 +20,7 @@ const Dashboard = () => {
 
   const stats = data?.stats!;
 
-  if (isError) return <Navigate to={"/"} />
-
-
+  if (isError) return <Navigate to={"/"} />;
 
   return (
     <div className="admin-container">
@@ -81,6 +80,7 @@ const Dashboard = () => {
 
                 {/* Graph here */}
                 <BarChart
+                  labels={getLastMonths().last6Months}
                   data_1={stats.chart.revenue}
                   data_2={stats.chart.order}
                   title_1="Revenue"
@@ -179,7 +179,7 @@ const WidgetItem = ({
       <span style={{ color }}>
         {percent > 0 && `${percent > 10000 ? 9999 : percent}%`}
         {percent < 0 && `${percent < -10000 ? -9999 : percent}%`}
-        </span>
+      </span>
     </div>
   </article>
 );
