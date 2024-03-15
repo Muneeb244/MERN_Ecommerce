@@ -10,6 +10,7 @@ import { CartItem } from "../types/types";
 const Home = () => {
 
   const { data, isLoading, isError } = useLatestProductsQuery("");
+  
 
   const dispatch = useDispatch();
 

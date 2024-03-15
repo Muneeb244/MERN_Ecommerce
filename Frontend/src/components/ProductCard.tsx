@@ -24,7 +24,7 @@ const ProductCard = ({
     <div className="product-card">
       <img src={`${server}/${photo}`} alt="name" />
       <p>{name}</p>
-      <span>RS{price}</span>
+      <span>Rs{price}</span>
       <div>
         <button onClick={() => handler({
           productId,

@@ -9,17 +9,16 @@ import { server } from "../redux/store";
 import { cartReducerInitialState } from "../types/reducer-types";
 
 const Shipping = () => {
-  const { cartItems, total } =
-    useSelector(
-      (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
-    );
+  const { cartItems, total } = useSelector(
+    (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
+  );
 
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if(cartItems.length <= 0) return navigate("/cart")
-  },[cartItems])
+    if (cartItems.length <= 0) return navigate("/cart");
+  }, [cartItems]);
 
   const [shippingInfo, setShippingInfo] = useState({
     address: "",
@@ -36,25 +35,27 @@ const Shipping = () => {
   };
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    dispatch(saveShippingInfo(shippingInfo))
+    dispatch(saveShippingInfo(shippingInfo));
 
     try {
-      const {data} = await axios.post(`${server}/api/v1/payment/create`, {amount: total},
-      {
-        headers: {
-          "Content-type": "application/json"
+      const { data } = await axios.post(
+        `${server}/api/v1/payment/create`,
+        { amount: total },
+        {
+          headers: {
+            "Content-type": "application/json",
+          },
         }
-      })
+      );
       navigate("/pay", {
-        state: data.clienSecret
-      })
+        state: data.clientSecret,
+      });
     } catch (error) {
-      console.log(error)
-      toast.error("Somethingw went wrong")
+      toast.error("Something went wrong");
     }
-  }
+  };
 
   return (
     <div className="shipping">
@@ -62,7 +63,7 @@ const Shipping = () => {
         <BiArrowBack />
       </button>
 
-      <form onSubmit = {submitHandler} >
+      <form onSubmit={submitHandler}>
         <h1>Shipping Address</h1>
         <input
           type="text"

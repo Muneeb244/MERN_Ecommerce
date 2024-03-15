@@ -74,7 +74,7 @@ export const newProduct = asyncMiddleware(async (req, res, next) => {
     // })
     const { name, price, stock, category } = req.body;
     const photo = req.file;
-    // console.log("from new product",name, price, stock, category, photo)
+    console.log("from new product", name, price, stock, category, photo);
     if (!photo)
         return next(new ErrorHandler("Please add photo", 400));
     if (!name || !price || !stock || !category) {

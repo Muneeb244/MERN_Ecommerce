@@ -5,7 +5,7 @@ import { adminOnly } from '../middlewares/auth.js';
 const app = express.Router();
 
 // route - /api/v1/payment/coupon/create
-app.get("/create", createPaymentIntent);
+app.post("/create", createPaymentIntent);
 
 // route - /api/v1/payment/coupon/new
 app.get("/discount", discount);

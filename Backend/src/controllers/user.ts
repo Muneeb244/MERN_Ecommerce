@@ -44,7 +44,6 @@ export const getAllUsers = asyncMiddleware(async (req, res, next) => {
 
 export const getUser = asyncMiddleware(async (req, res, next) => {
 
-
   const id = (req.params as {id:string}).id;
   const user = await User.findById(id);
 
